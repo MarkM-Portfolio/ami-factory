@@ -45,7 +45,7 @@ jobs:
           # target: ./packer-windows/win2k19.pkr.hcl
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v24.7.0
+        uses: ansible/ansible-lint@v25.9.0
         with:
           working_directory: 'ansible/'
 
