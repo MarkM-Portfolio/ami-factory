@@ -1,0 +1,10 @@
+---
+- name: Setup base image
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  become_user: root
+  become_method: ansible.builtin.sudo
+  roles:
+    - common

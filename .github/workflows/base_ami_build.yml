@@ -1,0 +1,62 @@
+# Packer workflow to build AMI in AWS
+# The workflow Authenticates to the AWS Account, Validates 
+# packer templates, initializes packer and builds packer artifact
+name: Windows AMI Build workflow
+on:
+  push:
+    branches:
+      - 'main'
+  schedule:
+    - cron: '0 0 1 * *'
+  # pull_request: # For testing
+  #   branches:    
+  #     - 'main'
+
+env:
+  AWS_REGION: 'eu-west-2'
+# permission can be added at job level or workflow level    
+permissions:
+  id-token: write
+  contents: read    # This is required for actions/checkout
+jobs:
+  PackerBuild:
+    runs-on: ubuntu-22.04 # changed os version due to issue in packer proxy adapter for ansible
+    # if: github.event_name == 'pull_request' # For testing
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: arn:aws:iam::231639157514:role/github-oidc
+          role-session-name: actionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Validate Packer templates
+      - name: Validate Packer Template
+        # uses: hashicorp/packer-github-actions@master
+        uses: hashicorp/setup-packer@master
+        # uses: hashicorp/setup-packer@v3.1.0
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: ./packer-suse/suse15.pkr.hcl
+          # target: ./packer-windows/win2k19.pkr.hcl
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v24.7.0
+        with:
+          working_directory: 'ansible/'
+
+      # Initialize Packer templates
+      - name: Initialize Packer Template
+        working-directory: ./packer-suse
+        run: |
+          packer init .
+
+      # Build Artifact
+      - name:  Build Packer Artifact
+        working-directory: ./packer-suse
+        run: |
+          packer build .

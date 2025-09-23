@@ -1,0 +1,6 @@
+---
+- name: Start SSM Agent
+  ansible.builtin.systemd:
+    name: amazon-ssm-agent
+    state: started
+    enabled: true
