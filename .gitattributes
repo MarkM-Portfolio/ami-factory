@@ -1,0 +1,6 @@
+**/main.yml linguist-language=Ansible linguist-vendored=false
+*.gitattributes linguist-language=Git linguist-vendored=false
+*.gitignore linguist-language=Git linguist-vendored=false
+*.hcl linguist-language=Hcl linguist-vendored=false
+*.md linguist-language=Markdown linguist-vendored=false
+*.yml linguist-language=YAML linguist-vendored=false
